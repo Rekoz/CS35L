@@ -1,0 +1,18 @@
+Q1.
+Brady remove the line because it is redundant. It does not matter if this line 
+is removed. This is just a goto statement. The program will go through it.
+
+Q2.
+This patch will only work for English speakers. People knowing nothing
+about English cannot recognize the spelling of month in English and the order 
+the date is formatted in.
+
+Q3.
+Index Error.
+random.choice(seq) returns a random element from the non-empty sequence seq. If
+ seq is empty, IndexError is raised.
+
+Q4.
+    except IOError as (errno, strerror):
+                      ^
+SyntaxError: invalid syntax

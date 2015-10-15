@@ -1,0 +1,170 @@
+#!/usr/bin/python
+
+import sys
+from optparse import OptionParser
+
+#read files
+class comm:
+    def __init__(self, file1, file2):
+        if file1 != "-":
+            f1 = open(file1, 'r')
+        else:
+            f1 = sys.stdin
+        self.lines1 = f1.readlines()
+        f1.close()
+        if file2 != "-":
+            f2 = open(file2, 'r')
+        else:
+            f2 = sys.stdin
+        self.lines2 = f2.readlines()  
+        f2.close()
+
+    def firstcol(self):
+        return self.lines1
+
+    def secondcol(self):
+        return self.lines2
+
+def main():
+    version_msg = "%prog 2.0"
+    usage_msg = """%prog [OPTION]... FILE1 FILE2
+
+Compare sorted files FILE1 and FILE2 line by line.
+
+With no options, produce three-column output.  Column one contains
+lines unique to FILE1, column two contains lines unique to FILE2,
+and column three contains lines common to both files."""
+
+#add options
+    parser = OptionParser(version=version_msg,
+                          usage=usage_msg)
+    parser.add_option("-1", action="store_true", dest="sup_1", default=False,
+                      help="Suppress the output column"
+                           " of lines unique to file1.")
+    parser.add_option("-2", action="store_true", dest="sup_2", default=False,
+                      help="Suppress the output column"
+                           " of lines unique to file2.")
+    parser.add_option("-3", action="store_true", dest="sup_3", default=False,
+                      help="Suppress the output column"
+                           " of lines duplicated in file1 and file2.")
+    parser.add_option("-u", action="store_true", 
+                      dest="nocheckorder", default=False,
+                      help="Do not check that the input is correctly sorted.")
+
+    (options, args) = parser.parse_args(sys.argv[1:])
+
+#handle cases in which number of input files are not correct
+    if len(args) != 2:
+        if len(args) == 0:
+            parser.error("missing operand")
+        if len(args) == 1:
+            parser.error("missing operand after {0}".format(args[0]))
+        if len(args) > 2:
+            parser.error("extra operand {0}".format(args[2]))
+    input_file1 = args[0]
+    input_file2 = args[1]
+
+    try:
+        generator = comm(input_file1, input_file2)
+        a = generator.firstcol()
+        b = generator.secondcol()
+
+# captures IOError
+    except IOError as err: 
+        parser.error("I/O error({0}): {1}".
+                     format(errno, strerror))
+
+    col = ""
+    sup_1 = options.sup_1
+    sup_2 = options.sup_2
+    sup_3 = options.sup_3
+#handle the case where the last line of
+#the file does not end with a newline character
+    if "\n" not in a[len(a)-1]: 
+        a[len(a)-1] += '\n'
+    if "\n" not in b[len(b)-1]: 
+        b[len(b)-1] += '\n'
+#without -u option
+    if not options.nocheckorder:
+        i = 0
+        j = 0
+        #mark whether warning has been printed out
+        y1 = False
+        y2 = False
+        #compare items in a and b. Output smaller one.
+        while i < len(a) and j < len(b):
+            if a[i] < b[j]:
+                #check if sorted
+                if i > 0 and a[i-1]>a[i] and not y1:
+                    y1 = True
+                    col += "comm: file 1 is not in sorted order\n"
+                #check if column2 is suppressed
+                if not sup_1:
+                    col += a[i]
+                i = i + 1
+            elif a[i] > b[j]:
+                #check if sorted
+                if j > 0 and b[j-1]>b[j] and not y2:
+                    y2 = True
+                    col += "comm: file 2 is not in sorted order\n"
+                #check if column2 is suppressed
+                if not sup_2:
+                    if sup_1:
+                        col += b[j]
+                    else:
+                        col += "\t"+b[j]
+                j = j + 1
+            else:
+                #the element exists in both a and b
+                if not sup_3:
+                    if sup_1 and sup_2:
+                        col += a[i]
+                    elif sup_1 or sup_2:
+                        col += "\t"+a[i]
+                    else:
+                        col += "\t\t"+a[i]
+                i = i + 1
+                j = j + 1
+        #if some lines are not output after comparison, output them all.
+        if len(a) > i and not sup_1:
+            for k in range(i, len(a)):
+                col += a[k]
+        if len(b) > j and not sup_2:
+            for k in range(j, len(b)):
+                if sup_1:
+                    col += b[k]
+                else:
+                    col += "\t"+b[k]
+    else: #with -u option
+        #for every element in a, we check if it exists in b.
+        for i in range(len(a)):
+            found = False
+            for j in range(len(b)):
+                #if same element is found in b, delete that element in b 
+                #and add it to the third column(if not compressed).
+                if a[i] == b[j]:
+                    if not sup_3:
+                        if sup_1 and sup_2:
+                            col += a[i]
+                        elif sup_1 or sup_2:
+                            col += "\t"+a[i]
+                        else:
+                            col += "\t\t"+a[i]
+                    b.pop(j)
+                    found = True
+                    break
+            #else just add it to the first column.
+            if not found and not sup_1:
+                col += a[i]
+        #add the remaining elements in b to the second column
+        if not sup_2:
+            for j in range(len(b)):
+                if sup_1:
+                    col += b[j]
+                else:
+                    col += "\t"+b[j]
+    #output the final result
+    sys.stdout.write(col)
+
+if __name__ == "__main__":
+    main()

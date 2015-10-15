@@ -1,0 +1,13 @@
+Top left: All the patches in chronological order, with short descriptions of
+changes made and graphical representation of how they were merged.
+
+Top middle: Authors' names and emails
+
+Top right: date and time of the commit made
+
+SHAl ID: hash number of the patch
+
+Lower left: Contents of the patches. We can view it in diff, old or new version
+
+Lower right: View different portions of the patch. We can view it in path or
+tree mode.

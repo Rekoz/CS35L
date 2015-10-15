@@ -1,0 +1,16 @@
+2015-04-25  Yunong Jiang  <yunong@lnxsrv02.seas.ucla.edu>
+
+	maint: quote 'like this' or "like this", not `like this'
+
+	This is in response to a recent change in the GNU coding standards,
+	which now suggest quoting 'like this' or "like this", instead of
+	`like this' or ``like this''.
+	* util.c: (finish_output):
+	* sdiff.c: (try_help, usage, check_child_status, main):
+	* dir.c: (compare_names):
+	* diff3.c: (main, try_help, option_help_msgid, usage)
+	           (read_diff):
+	* diff.c: (main, try_help, option_help_msgid, specify_value)
+		  (compare_files):
+	* cmp.c: (try_help, specify_ignore_initial, usage, main):
+	Quote 'like this' in output.

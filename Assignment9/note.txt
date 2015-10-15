@@ -1,0 +1,25 @@
+STATIC .a
+
+create static library:
+ar -cvq libmymath.a *.o
+
+gcc main.c -o main -I ../mymathlib/ // find header files
+gcc main.c -o main -I ../mymathlib/ ../mymathlib/libmymath.a // find static library
+
+libc: C standard library
+
+create dynamic shared library:
+gcc -shared -o libmymath.so *.o
+
+gcc main.c -o main -I ../mymathlib/ -L ../mymathlib/ -lmymath // find dynamic linking
+
+lib(libraryname).so
+libmymath.so
+
+Tell the system to look for additional dynamic link:
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/u/cs.../mymathlib
+
+gcc -o main main.c -ldl // dynamic loading; #include<dlfcn.h> don't need to include mymathlib
+
+static: only available in the same file
+extern: available to all files

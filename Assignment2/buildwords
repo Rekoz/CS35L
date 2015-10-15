@@ -1,0 +1,45 @@
+#!/bin/bash
+# Buildwords
+
+#Convert uppercase letters to lowercase
+#tr '[:upper:]' '[:lower:]' | \
+
+#delete useless text at the beginning
+#sed '/<!doctype/,/adopt/d' | \
+
+#delete useless text at the end
+sed '/<\/table>/,/<\/html>/d' | \
+
+#delete <br> lines
+#sed '/<td><br>/,/<td><\/td>/d' | \
+
+#delete even numbered lines(lines containing english words)
+#sed '2~2d' | \
+
+#delete lines containing<tr> tags
+#sed '/<tr>/d' | \
+
+#delete tags and spaces before the words
+sed 's/    <td>//g' | \
+
+#delete all tags
+sed 's/<[^>]*>//g' | \
+
+#replace ` with '
+sed 's/`/'"'"'/g' | \
+
+#treat words with commas or spaces as several separate words
+sed 's/, /\n/g' | \
+sed 's/ /\n/g' | \
+
+#replace carraige returns with newlines
+sed 's/\r/\n/g' | \
+
+#delete empty lines, including lines with only spaces
+sed '/^\s*$/d' | \
+
+#remove words that contain non-Hawaiian letters
+sed '/[^pk\x27mnwlhaeiou]/d' | \
+
+#sort the words, eliminating repeated ones
+sort -u

@@ -1,0 +1,48 @@
+1. git clone git://git.savannah.gnu.org/diffutils.git
+2. change directory to diffutils, then use git log > git-log.txt
+3. git tag > git-tags.txt
+4. I went to emacs and found out the commit's hash number is 62ca21..
+   Then use the command "git show 62ca21 > quote-patch.txt
+5. git checkout v3.0
+6. patch -p0 quote-patch.txt
+   Hit return to skip files.
+7. git status
+   It showed a list of modified and untracked files.
+8. This step is to read about certain emacs functions.
+9. For each file other than c file, I used emacs to edit it and used the comman
+d  "C-x v ="
+   "C-x v u" to revert all the changes.
+   An alternative way to do this is using the command "git checkout NEWS README
+ TODO doc/diagmeet.note ms/config.bat ms/config.site po/en.po src/diff.h src/sy
+stem.h tests/help-version"
+   Then I used emacs to edit all the other .c files and reverted all the 
+changes in comments.
+10. I found two patches needed to add through diff.c.rej and diff3.c.rej. Then
+I applied the changes manually by going into the diff.c and diff3.c files.
+11. I used "git clean -f" to remove all untracked files.
+12. I used "git status" to check the remaining files and "git diff > quote-3.0
+-patch.txt" to put the patch into the file.
+13. I first changed the path using command "export PATH=/usr/local/cs/bin:$PATH
+"
+   Then I used: 
+   	   ./bootstrap
+           ./configure
+	   make
+	   make check
+14.  I used the command:
+            mv diffutils diffutils-patch
+            to rename the patched diffutils.
+     Then I used the command:
+       	    git clone git://git.savannah.gnu.org/diffutils.git
+     to reclone diffutils
+     And then use the commands:
+	    cp -ar diffutils/src diffutils-3.0
+	    cp -ar diffutils-patch/src diffutils-3.0-patch
+     to put the source codes.
+     To run my diff:
+     	    diffutils-patch/src/diff -pru diffutils-3.0 diffutils-3.0-patch 
+	    > quote-3.0-test.txt
+15. I used the command:
+    diff quote-3.0-test.txt quote-3.0-patch.txt
+    to compare the diffrence.
+    They are not identical, but the differences are innocuous. Basically they are just a few changes in backticks vs single quotes in comments.

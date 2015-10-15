@@ -1,0 +1,27 @@
+First, I installed the OpenSSH
+       sudo apt-get update
+       sudo apt-get install openssh-server
+       sudo apt-get install openssh-client
+
+I first was the client, so after my partner set up the server, I used the
+commands (My username was User1 and password was 123456. IP address was 
+10.97.85.235):
+	ssh-keygen // generate keys
+	ping server_ip_addr // test delay
+	ssh-copy-id -i <UserName>@server_ip_addr //copy public key to the 
+		       				   server
+	ssh-add // add private key to agent
+	ssh -X User1@10.97.85.235
+	xterm
+	firefox // run software on server
+
+Then I switched to be the server (I set username to User2 and password 123456):
+     sudo useradd -d /home/User2 -m User2 // add user
+     sudo passwd User2 (then typed in password) // set password
+     cd /home/
+     sudo mkdir .ssh // create .ssh directory
+     sudo chown -R User2 .ssh // change ownership
+     sudo chmod 700 .ssh // change permission
+     ifconfig // gives me the IP address
+     ps aux | grep ssh // showed a process named 'sshd'
+Then my partner was able to access my server.

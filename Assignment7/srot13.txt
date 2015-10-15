@@ -1,0 +1,26 @@
+1. I used the file rt.jar to measure the performance differences between 
+srot13, srot13u and srot13s
+srot13:
+	real    0m3.331s
+	user    0m2.219s
+	sys 	0m0.075s
+srot13u:
+Number of comparisons: 10231500
+        real    1m4.885s
+        user    0m4.340s
+        sys     0m59.950s
+srot13s:
+	real    0m3.898s
+	user    0m2.909s
+	sys     0m0.252s
+
+2.
+I wrote a simple program to generate test data.
+Lines Comparisons
+10 21
+100 547
+1000 8720
+10000 120421
+100000 1536328
+1000000 10773315
+The time complexity is Nlog(N).

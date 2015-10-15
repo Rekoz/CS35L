@@ -1,0 +1,130 @@
+Outputs and reasons for the given tr commands:
+
+1.
+Output: Replace any non-letter charater in assign2.html with a return character.
+Why: The tr command replaces occurrences of the characters in the first set with
+the corresponding elements from the other set. -c complements the set of values 
+in SET1.
+2. 
+Output: Squeeze multiple occurrences of return characters in the output of 1 int
+o one single return character.
+Why: The -s command squeezes multiple occurrences of the characters listed in th
+e last operand in the input into a single instance of the character.
+3.
+Output: Result of 2 in alphabetic order in standard C locale. 
+Why: After doing 2, it sorts the result using the command "sort".
+4.
+Output: Result of 2 after squeezing multiple occurences of the same word into on
+e instance of that word.
+Why: -u command without -c outputs only the first of an equal run
+5.
+Output: Column1: lines unique to the output of 4. Column2: lines unique to the f
+-ile words. Column3: lines common to both files.
+Why: comm command compares two sorted files line-by-line
+6.Output: lines unique to the output of 4.
+Why: -23 option suppresses column 2 and 3 of the output of 5.
+
+-------------------------------------------------------------------------------
+
+Buildwords script:
+
+#!/bin/bash
+# Buildwords
+
+#Convert uppercase letters to lowercase
+tr '[:upper:]' '[:lower:]' | \
+
+#delete useless text at the beginning
+sed '/<!doctype/,/adopt/d' | \
+
+#delete useless text at the end
+sed '/<\/table>/,/<\/html>/d' | \
+
+#delete <br> lines
+sed '/<td><br>/,/<td><\/td>/d' | \
+
+#delete even numbered lines(lines containing english words)
+sed '2~2d' | \
+
+#delete lines containing<tr> tags
+sed '/<tr>/d' | \
+
+#delete tags and spaces before the words
+sed 's/    <td>//g' | \
+
+#delete all tags
+sed 's/<[^>]*>//g' | \
+
+#replace ` with '
+sed 's/`/'"'"'/g' | \
+
+#treat words with commas or spaces as several separate words
+sed 's/, /\n/g' | \
+sed 's/ /\n/g' | \
+
+#replace carraige returns with newlines
+sed 's/\r/\n/g' | \
+
+#delete empty lines, including lines with only spaces
+sed '/^\s*$/d' | \
+
+#remove words that contain non-Hawaiian letters
+sed '/[^p^k^\x27^m^n^w^l^h^a^e^i^o^u]/d' | \
+
+#sort the words, eliminating repeated ones
+sort -u
+
+
+Then we need to make it executable by using the command:
+chmod 775 buildwords
+
+-------------------------------------------------------------------------------
+
+Create hwords containing sorted Hawaiian words:
+sort < /usr/share/dict/words > hwords
+
+-------------------------------------------------------------------------------
+
+To find the number of misspelled Hawaiian words:
+tr '[:upper:]' '[:lower:]' < assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | 
+\ comm -23 - hwords | wc -l
+The output is 406.
+
+To find the number of misspelled English words:
+tr '[:upper:]' '[:lower:]' < assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | 
+\ comm -23 - words | wc -l
+The output is 39.
+
+Running the checker on hwords itself:
+tr '[:upper:]' '[:lower:]' < hwords | tr -cs 'A-Za-z' '[\n*]' | sort -u | \ 
+comm -23 - hwords | wc -l
+The output is 46. It is not 0 because the checker replaces "'" in hwords with
+newline character.
+
+To find words misspelled in English but not in Hawaiian:
+tr '[:upper:]' '[:lower:]' < assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | 
+\ comm -23 - words | comm -12 - hwords
+#These commands first find out the words misspelled in English after doing "comm
+ -23 -words". Then the output is compared with hwords. By suppressing the first 
+and second column, the last command shows the misspelled English words that are 
+in Hawaiian dictionary, i.e. words misspelled in English but not in Hawaiian.
+Output: 
+halau
+lau
+wiki
+
+To find words misspelled in Hawaiian but not in English:
+tr '[:upper:]' '[:lower:]' < assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | 
+\ comm -23 - hwords | comm -12 - words
+#These commands first find out the words misspelled in Hawaiian after doing
+"comm -23 -hwords". Then the output is compared with words. By suppressing the 
+first and second column, the last command shows the misspelled Hawaiian words 
+that are in English dictionary, i.e. words misspelled in Hawaiian but not in 
+English.
+Output:
+a
+able
+about
+above
+abovementioned
+(These are just examples. The actual output has a large number of words.)

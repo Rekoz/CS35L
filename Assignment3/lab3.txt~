@@ -1,0 +1,47 @@
+1. grab coreutils 
+wget ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gx
+2. install coreutils
+tar -xvf coreutils-7.6.tar.gz
+mkdir build // creates a directory in which to install coreutils
+./configure --prefix=/u/cs/ugrad/yunong/build // configure the package
+make // compile
+make install // install
+3. reproduce the bug
+export LC_ALL='en_US.UTF-8'
+cd ..
+cd build // change direcotry to where the package is installed
+cd bin // change directory to where ls is
+./ls -l // use the ls program in coreutils to reproduce the bug
+Output example: -rwxr-xr-x 1 yunong csugrad 392544 2015-04-13 16:48 vdir
+4. Apply Brady's patch
+cd
+cd coreutils-7.6/src
+emacs ls.c // use emacs to edit the source file
+M-g g 2014 Enter // go to line 2014
+Delete the lines prefixed by - and add the lines prefixed by + in Brady's patch
+ to ls.c.
+Save the file. Exit emacs.
+5. Build the fixed version
+Change direcotry to coreutils-7.6 // go to the top level of the source tree
+Type make, then hit Enter. // We only need this command, because make will take
+ instructions from Makefile and only recompile those updated files according to
+ the modification time.
+6. Test
+To test the modified version:
+~/coreutils-7.6/src/ls -l
+To test the installed version:
+~/build/bin/ls -l
+---------------------------------------------------
+Current diretory: ~/build/bin
+For recently modified file:
+The modified version shows: 
+-rwxr-xr-x 1 yunong csugrad 119886 2015-04-13 16:48 wc
+while the installed version shows:
+-rwxr-xr-x 1 yunong csugrad 119886 Apr 13 16:48 wc
+---------------------------------------------------
+For an older file:
+touch -t 201307311000 yes // artificially make a file older
+The modified version shows: 
+-rwxr-xr-x 1 yunong csugrad  72665 Jul 31  2013 yes
+while the installed version shows:
+-rwxr-xr-x 1 yunong csugrad  72665 2013-07-31 10:00 yes

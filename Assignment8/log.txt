@@ -1,0 +1,40 @@
+I first added the path to PATH:
+     PATH=/usr/local/cs/bin:$PATH
+Then I checked I am using the new version of sort:
+     sort --version
+which shows a version from 2014.
+
+Then I created a file containing 10,000,000 random double numbers:
+     od -An -fD -N 80000000 < /dev/urandom | tr -s ' ' '\n' > random.txt
+where:
+	-An: Offsets shall not be written
+	-fD: specifies type as double
+	-N 80000000: generate 80000000 bytes of data = 10000000 double numbers
+
+Time of sort:
+     time -p sort -g random.txt > /dev/null
+     real 91.24
+     user 381.09
+     sys 20.95
+With multithreading:
+     time -p sort -g --parallel=1 random.txt > /dev/null
+     real 352.34
+     user 328.12
+     sys 24.18
+     time -p sort -g --parallel=2 random.txt > /dev/null
+     real 184.32
+     user 348.10
+     sys 1.43
+     time -p sort -g --parallel=4 random.txt > /dev/null
+     real 109.54
+     user 350.29
+     sys 9.80
+     time -p sort -g --parallel=8 random.txt > /dev/null	
+     real 83.26
+     user 369.83
+     sys 4.97
+
+
+Because qsort uses the idea of "divide and conquer", different threads are inde
+pendent of each other. So when we increase the thread by 2 times, the time will
+ decrease by 2 times.

@@ -1,0 +1,18 @@
+2. git checkout -b quote
+3. My quote-3.0-patch.txt is stored in a different directory:
+   patch -p1 < ~/Assignment\ 4/quote-3.0-patch.txt
+4. I opened the modified c files using emacs, typed the command "C-x 4 a" in each c file to add entries.
+5. Then I opened the original quote-patch.txt, copied the corresponding descriptions to the ChangeLog and saved the file.
+6. git add ./src
+   git commit --file="src/ChangeLog"
+7. git format-patch -1 --stdout > ~/Assignment\ 4/formatted-patch.txt
+8. git checkout v3.0 -b partner
+   git am formatted-patch.txt
+   ./bootstrap
+   ./configure
+   make
+   make check
+9. make distdir
+   Then I saw the resulting ChangeLog file contains my commit.
+10.
+		     

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+export LC_ALL='C'
+dir=$1
+IFS=$'\n'
+files=`ls -ab $dir`
+declare -a uniqueFiles #this array stores all file names that are not duplicate of any other file
+count=0 #count the number of unique files
+
+for file in $files #loop over each file
+do
+    duplicate=0 #duplicate represents whether the current file is a duplicate of another file
+    if [ -f "$dir/$file" ] #if the current file is a regular file
+    then
+	for ((i=count-1; i>=0; i--)) #loop over each unique file
+	do
+	    cmp -s "$dir/$file" "${uniqueFiles[$i]}" #compare two files
+	    if [ $? == 0 ] #if they are the same
+	    then
+		rm "$dir/$file" #remove the current file
+		ln "${uniqueFiles[$i]}" "$dir/$file" #create a hard link with the same name of the removed file
+		duplicate=1 #mark that the current file is a duplicate
+		break
+	    fi
+	done
+	if [ $duplicate==0 ] #if the current file is not a duplicate
+	then
+	    uniqueFiles[$count]="$dir/$file" #add the file name to the unique files array
+	    let count=count+1 #add the number of unique files
+	fi
+    fi
+done
